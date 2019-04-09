@@ -4,10 +4,12 @@
 var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','sweep','tauntaun','unicorn','usb','water-can','wine-glass'];
 var storedClicks = [];
 var storedViews = [];
+var productName = [];
 //hold all objects of mallProduct
 var allProducts = [];
 var lastViewedArr;
 var randArr = [];
+var busMallChart;
 
 function MallProduct(name)
 {
@@ -62,6 +64,15 @@ function clearProd()
     prodArr[i].title = '';
   }
 }
+function prepChartData()
+{
+  for(var i = 0; i < allProducts.length; i++)
+  {
+    productName.push(allProducts[i].title);
+    storedClicks.push(0);
+    storedViews.push(0);
+  }
+}
 function handleClick(id)
 {
   console.log('In evenHandler');
@@ -75,7 +86,8 @@ function handleClick(id)
       var tmpData = sessionStorage.getItem(allProducts[i].storKeyClick);
       tmpData++;
       sessionStorage.setItem(allProducts[i].storKeyClick, tmpData);
-      storedClicks.push(tmpData);
+      storedClicks[i] = tmpData;
+
       console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].storKeyClick));
     }
   }
@@ -87,14 +99,55 @@ function handleClick(id)
       var tmpData2 = sessionStorage.getItem(tmpIndex + 'ViewKey');
       tmpData2++;
       sessionStorage.setItem(allProducts[i].storKey, tmpData2);
-      storedViews.push(tmpData2);
+      storedViews[i] = tmpData2;
     }
   }
   clearProd();
   generateProd();
+  makeChart();
 }
 
+//http://www.chartjs.org/ 
+
+var data =
+{
+  labels: productName,
+  datasets:
+  [{
+    data: storedClicks,
+    backgroundColor: 
+    [
+      'bisque',
+      'darkgray',
+      'burlywood',
+      'lightblue',
+      'navy'
+    ],
+    hoverBackGroundColor:
+    [
+      'purple',
+      'purple',
+      'purple',
+      'purple',
+      'purple'
+    ]
+  }]
+};
+
+function makeChart()
+{
+  var ctx = document.getElementById('busmall-chart').getContext('2d');
+  busMallChart = new Chart(ctx,{
+    type: 'bar',
+    data: data,
+  });
+  console.log(storedClicks);
+  console.log(productName);
+}
+
+prepChartData();
 generateProd();
+
 document.getElementById('pickpic').addEventListener('click',function(event)
 {
   if(event.target.id !== 'pickpic')
