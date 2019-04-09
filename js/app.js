@@ -2,8 +2,8 @@
 
 //array of all product names
 var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','sweep','tauntaun','unicorn','usb','water-can','wine-glass'];
-var storedClicks = [];
-var storedViews = [];
+//var storedClicks = [];
+//var storedViews = [];
 //hold all objects of mallProduct
 var allProducts = [];
 var imgEl;
@@ -18,6 +18,8 @@ function MallProduct(name)
   this.title = name;
   this.views = 0;
   this.clicks = 0;
+  sessionStorage.setItem(this.storKey,this.clicks);
+  sessionStorage.setItem(this.storKey,this.views);
 
   allProducts.push(this);
 }
@@ -33,13 +35,15 @@ console.log('Length of allProducts: ', allProducts.length);
 console.log('Random Gen value: ',rand(0, allProducts.length - 1) );
 console.table(allProducts);
 
-function checkLastViewed(pic)
+function checkLastViewed(picName)
 {
+  lastViewed = [(JSON.parse(sessionStorage.getItem(picName)))];
+  console.log('checkLastViewed(): lastViewed =',lastViewed);
   for(var i = 0; i < lastViewed.length; i++)
   {
-    if(pic === lastViewed[i])
+    if(picName === lastViewed[i])
     {
-      return 1; 
+      return 1;
     }
     else
     {
@@ -47,11 +51,11 @@ function checkLastViewed(pic)
     }
   }
 }
-function checkForDuplicate(pic)
+function checkForDuplicate(picName)
 {
   for(var i = imgEl.length-1; i >= 0; i--)
   {
-    if(pic === lastViewed[i])
+    if(picName === imgEl[i].title)
     {
       return 1;
     }
@@ -62,9 +66,10 @@ function checkForDuplicate(pic)
   }
 }
 
-function markLastViewed(num, pic)
+function markLastViewed(num, picName)
 {
-  lastViewed[num] = pic;
+  lastViewed[num] = picName;
+  sessionStorage.setItem('lastViewed', JSON.stringify(lastViewed) );
 }
 
 /* change this function to clear localStorage
@@ -75,6 +80,7 @@ function clearLastViewed()
     lastViewed.pop();
   }
 }*/
+
 function handleClick(event)
 {
   var tmpName = event.target.title;
@@ -82,10 +88,10 @@ function handleClick(event)
   {
     if(tmpName === allProducts[i].name)
     {
-      allProducts[i].clicks++;
-      sessionStorage.setItem(allProducts[i].name, allProducts[i].clicks);
-      allProducts[i].clicks = sessionStorage.getItem(allProducts[i].name);
-      console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].name));
+      var tmpData = sessionStorage.getItem(allProducts[i].storKey);
+      tmpData++;
+      sessionStorage.setItem(allProducts[i].storKey, tmpData);
+      console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].storKey));
     }
   }
   for(i = 0; i < 3; i++)
@@ -93,8 +99,9 @@ function handleClick(event)
     var tmpIndex = imgEl[i].title;
     if(tmpIndex === allProducts[i].name)
     {
-      sessionStorage.setItem(allProducts[i].storKey, allProducts[i].views++);
-      allProducts[i].views = sessionStorage.getItem(allProducts[i].storKey);
+      var tmpData2 = sessionStorage.getItem(tmpIndex+'key');
+      tmpData2++;
+      sessionStorage.setItem(allProducts[i].storKey, tmpData2);
     }
   }
   document.location.reload();
@@ -123,7 +130,7 @@ function generateProd()
         console.log('In while loop');
         index = rand(0, allProducts.length - 1);
       }
-      lastViewed[i] = allProducts[index];
+      markLastViewed(i,allProducts[index].name);
     }
     else
     {
@@ -132,7 +139,7 @@ function generateProd()
       {
         index = rand(0,allProducts.length - 1);
       }
-      lastViewed[i] = allProducts[index];
+      markLastViewed(i,allProducts[index].name);
     }
 
     imgEl[i].src = allProducts[index].url;
@@ -142,11 +149,12 @@ function generateProd()
   }
   //clearLastViewed();
 
-  for(i = 0; i < lastViewed.length; i++)
+  /*for(i = 0; i < lastViewed.length; i++)
   {
     markLastViewed(i,imgEl[i].title);
     //console.log('imgEl',imgEl[i].title);
-  }
+  }*/
+
   console.log('lastView: ',lastViewed);
   console.log('imEl:', imgEl);
   console.table(allProducts);
@@ -157,7 +165,7 @@ generateProd();
 prod1.addEventListener('click',handleClick);
 prod2.addEventListener('click',handleClick);
 prod3.addEventListener('click',handleClick);
-console.log(sessionStorage.getItem(allProducts[14].name));
+console.log(sessionStorage.getItem(allProducts[0].storKey));
 console.log(allProducts[14].storKey);
 
 
