@@ -83,9 +83,9 @@ function handleClick(event)
     if(tmpName === allProducts[i].name)
     {
       allProducts[i].clicks++;
-      localStorage.setItem(allProducts[i].name, allProducts[i].clicks);
-      allProducts[i].clicks = localStorage.getItem(allProducts[i].name);
-      console.log('getItem from session storage', localStorage.getItem(allProducts[i].name));
+      sessionStorage.setItem(allProducts[i].name, allProducts[i].clicks);
+      allProducts[i].clicks = sessionStorage.getItem(allProducts[i].name);
+      console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].name));
     }
   }
   for(i = 0; i < 3; i++)
@@ -93,8 +93,8 @@ function handleClick(event)
     var tmpIndex = imgEl[i].title;
     if(tmpIndex === allProducts[i].name)
     {
-      localStorage.setItem(allProducts[i].storKey, allProducts[i].views++);
-      allProducts[i].views = localStorage.getItem(allProducts[i].storKey);
+      sessionStorage.setItem(allProducts[i].storKey, allProducts[i].views++);
+      allProducts[i].views = sessionStorage.getItem(allProducts[i].storKey);
     }
   }
   document.location.reload();
@@ -157,7 +157,7 @@ generateProd();
 prod1.addEventListener('click',handleClick);
 prod2.addEventListener('click',handleClick);
 prod3.addEventListener('click',handleClick);
-console.log(localStorage.getItem(allProducts[14].name));
+console.log(sessionStorage.getItem(allProducts[14].name));
 console.log(allProducts[14].storKey);
 
 
