@@ -6,8 +6,7 @@ var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair'
 //var storedViews = [];
 //hold all objects of mallProduct
 var allProducts = [];
-var imgEl;
-var lastViewed = ['','',''];
+var randArr;
 
 function MallProduct(name)
 {
@@ -27,65 +26,23 @@ for(var i = 0; i < picPool.length; i++)
 {
   new MallProduct(picPool[i]);
 }
-function rand(min,max)
+function rand(max)
 {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-console.log('Length of allProducts: ', allProducts.length);
-console.log('Random Gen value: ',rand(0, allProducts.length - 1) );
-console.table(allProducts);
-
-function checkLastViewed(picName)
-{
-  lastViewed = [(JSON.parse(sessionStorage.getItem(picName)))];
-  console.log('checkLastViewed(): lastViewed =',lastViewed);
-  for(var i = 0; i < lastViewed.length; i++)
+  var rArr = [];
+  for(var i = 0; i < 6; i++)
   {
-    if(picName === lastViewed[i])
-    {
-      return 1;
-    }
-    else
-    {
-      return 0;
-    }
+    rArr.push(Math.floor(Math.random() * max));
   }
+  return rArr;
 }
-function checkForDuplicate(picName)
-{
-  for(var i = imgEl.length-1; i >= 0; i--)
-  {
-    if(picName === imgEl[i].title)
-    {
-      return 1;
-    }
-    else
-    {
-      return 0;
-    }
-  }
-}
-
-function markLastViewed(num, picName)
-{
-  lastViewed[num] = picName;
-  sessionStorage.setItem('lastViewed', JSON.stringify(lastViewed) );
-}
-
-/* change this function to clear localStorage
-function clearLastViewed()
-{
-  for(var i = lastViewed.length - 1; i >=0; i--)
-  {
-    lastViewed.pop();
-  }
-}*/
 
 function handleClick(event)
 {
+  console.log('In evenHandler');
   var tmpName = event.target.title;
   for(var i = 0; i < allProducts.length; i++)
   {
+
     if(tmpName === allProducts[i].name)
     {
       var tmpData = sessionStorage.getItem(allProducts[i].storKey);
@@ -94,9 +51,9 @@ function handleClick(event)
       console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].storKey));
     }
   }
-  for(i = 0; i < 3; i++)
+  for(i = 0; i < prodArr.length; i++)
   {
-    var tmpIndex = imgEl[i].title;
+    var tmpIndex = prodArr[i].title;
     if(tmpIndex === allProducts[i].name)
     {
       var tmpData2 = sessionStorage.getItem(tmpIndex+'key');
@@ -107,64 +64,56 @@ function handleClick(event)
   document.location.reload();
   // event.preventDefault();
 
-
 }
 
 var prod1 = document.getElementById('prod1');
 var prod2 = document.getElementById('prod2');
 var prod3 = document.getElementById('prod3');
-imgEl = [prod1,prod2,prod3];
+var prodArr = [prod1,prod2,prod3];
+console.table(allProducts);
 function generateProd()
 {
-  console.log('Last Viewed: ', lastViewed);
-  var index;
-  for(var i = 0; i < imgEl.length; i++)
+  randArr = rand(0,allProducts.length-1);
+  for(var i = 0; i < randArr.length; i++)
   {
-    index = rand(0,allProducts.length - 1);
-    console.log('var i: ',i);
-    if(i > 0)
+    for(var j = 0; j<randArr.length;j++)
     {
-      console.log('comparison of: ' + allProducts[index].name + ' and ' + imgEl[i-1].title);
-      while( (checkLastViewed(allProducts[index].name) !== 0 ) || (checkForDuplicate(allProducts[index].name) !== 0) )
+      if(randArr[i] === randArr[j])
       {
-        console.log('In while loop');
-        index = rand(0, allProducts.length - 1);
+        randArr[i] = Math.floor(Math.random() * allProducts.length);
       }
-      markLastViewed(i,allProducts[index].name);
     }
-    else
-    {
-      console.log('First pass');
-      while(checkLastViewed(allProducts[index].name) !== 0)
-      {
-        index = rand(0,allProducts.length - 1);
-      }
-      markLastViewed(i,allProducts[index].name);
-    }
-
-    imgEl[i].src = allProducts[index].url;
-    imgEl[i].alt = allProducts[index].alt;
-    imgEl[i].title = allProducts[index].title;
-
   }
-  //clearLastViewed();
-
-  /*for(i = 0; i < lastViewed.length; i++)
+  if(randArr === [])
   {
-    markLastViewed(i,imgEl[i].title);
-    //console.log('imgEl',imgEl[i].title);
-  }*/
+    randArr = rand();
+  }
+  prod1.src = allProducts[ randArr[randArr.length-1] ].url;
+  prod1.alt = allProducts[ randArr[randArr.length-1] ].alt;
+  prod1.title = allProducts[ randArr[randArr.length-1] ].title;
+  randArr.pop();
 
-  console.log('lastView: ',lastViewed);
-  console.log('imEl:', imgEl);
-  console.table(allProducts);
-  console.log(allProducts[0].clicks);
+  prod2.src = allProducts[ randArr[randArr.length-1] ].url;
+  prod2.alt = allProducts[ randArr[randArr.length-1] ].alt;
+  prod2.title = allProducts[ randArr[randArr.length-1] ].title;
+  randArr.pop();
+
+  prod3.src = allProducts[ randArr[randArr.length-1] ].url;
+  prod3.alt = allProducts[ randArr[randArr.length-1] ].alt;
+  prod3.title = allProducts[ randArr[randArr.length-1] ].title;
+  randArr.pop();
 
 }
+
 generateProd();
 prod1.addEventListener('click',handleClick);
+//prod1.removeEventListener('click',handleClick);
 prod2.addEventListener('click',handleClick);
+//prod2.removeEventListener('click',handleClick);
 prod3.addEventListener('click',handleClick);
+//prod3.removeEventListener('click',handleClick);
+
+
 console.log(sessionStorage.getItem(allProducts[0].storKey));
 console.log(allProducts[14].storKey);
 
