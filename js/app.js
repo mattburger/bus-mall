@@ -82,7 +82,8 @@ function handleClick(event)
   {
     if(tmpName === allProducts[i].name)
     {
-      localStorage.setItem(allProducts[i].name, allProducts[i].clicks++);
+      allProducts[i].clicks++;
+      localStorage.setItem(allProducts[i].name, allProducts[i].clicks);
       allProducts[i].clicks = localStorage.getItem(allProducts[i].name);
       console.log('getItem from session storage', localStorage.getItem(allProducts[i].name));
     }
@@ -99,9 +100,7 @@ function handleClick(event)
   document.location.reload();
   // event.preventDefault();
 
- /* var tmpProd1 = event.target.prod1;
-  var tmpProd2 = event.target.prod2;
-  var tmpProd3 = event.target.prod3;*/
+
 }
 
 var prod1 = document.getElementById('prod1');
@@ -136,8 +135,6 @@ function generateProd()
       lastViewed[i] = allProducts[index];
     }
 
-
-    // imgEl[i].addEventListener('click',handleClick);
     imgEl[i].src = allProducts[index].url;
     imgEl[i].alt = allProducts[index].alt;
     imgEl[i].title = allProducts[index].title;
