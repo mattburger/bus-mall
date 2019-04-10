@@ -267,7 +267,7 @@ function makeChart()
   */
 }
 
-function checkClick()
+/*function checkClick()
 {
   if(localStorage)
   {
@@ -281,7 +281,7 @@ function checkClick()
 }
 prepChartData();
 generateProd();
-
+*/
 
 document.getElementById('pickpic').addEventListener('click',function(event)
 {
