@@ -278,10 +278,10 @@ function makeChart()
     prepChartData();
     generateProd();
   }
-}
+}*/
 prepChartData();
 generateProd();
-*/
+
 
 document.getElementById('pickpic').addEventListener('click',function(event)
 {
