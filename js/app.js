@@ -2,8 +2,10 @@
 
 //array of all product names
 var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','sweep','tauntaun','unicorn','usb','water-can','wine-glass'];
-var chartColors = ['bisque','darkgray','burlywood','lightblue','navy','maroon','brown','red','orange','yellow','beige','mint','lavender','apricot','cyan','green','brown','gray','olive','teal','black','navy','white','blue','lime'];
-console.log(chartColors.length);
+var chartColors = ['bisque','darkgray','burlywood','lightblue','navy','maroon','brown','red','orange','yellow','beige','mint','lavender','apricot','cyan','green','brown','gray','olive','teal'/*,'black','navy','white','blue','lime'*/];
+var randArrData = [];
+var dupTracker = [];
+var lastViewTracker = [];
 var storedClicks = [];
 var storedViews = [];
 var productName = [];
@@ -12,6 +14,19 @@ var allProducts = [];
 var lastViewedArr = [];
 var randArr = [];
 var busMallChart;
+
+function fillRandArrData(arr)
+{
+  for(var i = 0; i < 20; i++)
+  {
+    arr.push(i);
+  }
+}
+
+fillRandArrData(randArrData);
+
+var funcUseArr = randArrData;
+console.log('copied to funcUseArr',funcUseArr);
 
 function MallProduct(name)
 {
@@ -23,8 +38,6 @@ function MallProduct(name)
   this.title = name;
   this.views = 0;
   this.clicks = 0;
-  sessionStorage.setItem(this.storKey,this.clicks);
-  sessionStorage.setItem(this.storKey,this.views);
 
   allProducts.push(this);
 }
@@ -32,69 +45,103 @@ for(var i = 0; i < picPool.length; i++)
 {
   new MallProduct(picPool[i]);
 }
-function rand()
+//var toLs = JSON.stringify(allProducts);
+//localStorage.setItem('allProducts',toLs);
+
+function rand(arr)
 {
-  return (Math.floor(Math.random() * allProducts.length));
+  return (Math.floor(Math.random() * arr.length));
 }
 
-function genRandArr()
+function genRandArr(arr)
 {
-  while(randArr.length < 3)
+  while(arr.length < 3)
   {
     for(var i = 0; i < 3;i++)
     {
-      randArr.push(rand());
+      arr.push(rand(allProducts));
     }
   }
+  console.log(arr);
 }
+
+
+function dupFixer(rArr,dupTrack,rArrData)
+{
+
+  if(rArrData.length < allProducts.length)
+  {
+    console.log('dupfixer randArrData passed in:',rArrData);
+    for(var i = 0; i < dupTrack.length;i++)
+    {
+      rArr[dupTrack[i]] = rArrData[rand(rArrData.length)];
+    }
+    dupTrack = [];
+    rArrData = [];
+
+  }
+
+}
+
+
+function lastViewedFixer(rArr,lvTrack,rArrData)
+{
+
+  for(var i = 0; i < lvTrack.length;i++)
+  {
+    rArr[lvTrack[i]] = rArrData[rand(rArrData)];
+  }
+  lvTrack = [];
+  rArrData = [];
+
+}
+
+
+function lastViewed(arr)
+{
+  for(var k = 0; k < funcUseArr.length;k++)
+  {
+    if(arr[k] === funcUseArr[k])
+    {
+      funcUseArr.splice(k,1);
+    }
+  }
+
+  for(var i = 0; i < lastViewedArr.length;i++)
+  {
+    for(var j = 0; j < arr.length; j++)
+    {
+
+      if(lastViewedArr[i] === arr[j])
+      {
+        lastViewTracker.push(lastViewedArr[i]);
+      }
+    }
+  }
+  lastViewedFixer(randArr,lastViewTracker,randArrData);
+}
+
 function dupCheck(arr)
 {
-  var flag = false;
-  if(arr === [])
+
+  for(var i = 0; i < arr.length;i++)
   {
-    return flag;
-  }
-  else
-  {
-    for(var i = 0; i < arr.length;i++)
+    for(var j = 0; j < arr.legth; j++)
     {
-      for(var j = 0; j < arr.legth; j++)
+      if(i !== j)
       {
-        if(i !== j)
+        if(arr[i] === arr[j])
         {
-          if(arr[i] === arr[j])
-          {
-            flag = true;
-            return flag;
-          }
+          randArrData.splice(arr[i],1);
+          console.log('splicy splicy',funcUseArr.splice(arr[i],1));
+          dupTracker.push(arr[i]);
+
         }
       }
     }
   }
-  return flag;
-}
-function lastViewed()
-{
-  var flag = false;
-  console.log(lastViewedArr);
-  if(lastViewedArr.length < 3)
-  {
-    return flag;
-  }
-  for(var i = 0; i < lastViewedArr.length;i++)
-  {
-    for(var j = 0; j < randArr.length; j++)
-    {
-      console.log('last viewed comparison: ' + lastViewed[j] + ' vs ' + randArr[i] );
-      if(lastViewed[j]===randArr[i])
-      {
-        flag = true;
-        return flag;
-      }
-    }
-  }
-  console.log('lastViewed check:',flag);
-  return flag;
+
+  dupFixer(randArr,dupTracker,randArrData);
 }
 
 var prod1 = document.getElementById('prod1');
@@ -105,16 +152,11 @@ var prodArr = [prod1,prod2,prod3];
 
 function generateProd()
 {
-  //document.getElementById('pickpic').removeEventListener()
-  genRandArr();
-  while(dupCheck(randArr))
-  {
-    genRandArr();
-  }
-  while(lastViewed())
-  {
-    genRandArr();
-  }
+  genRandArr(randArr);
+  /*need to tweak these two functions. possibility of clashing*/
+  dupCheck(randArr);
+  lastViewed(randArr);
+
   for(var i = 0; i < prodArr.length;i++)
   {
     prodArr[i].src = allProducts[randArr[i]].url;
@@ -142,6 +184,15 @@ function prepChartData()
     storedViews.push(0);
   }
 }
+function checkClicks()
+{
+  var tmpTotal = 0;
+  for(var i = 0; i < storedClicks.length; i++)
+  {
+    tmpTotal+=storedClicks[i];
+  }
+  return tmpTotal;
+}
 function handleClick(id)
 {
   console.log('In evenHandler');
@@ -152,12 +203,13 @@ function handleClick(id)
 
     if(tmpName === allProducts[i].name)
     {
-      var tmpData = sessionStorage.getItem(allProducts[i].storKeyClick);
+      var tmpData = localStorage.getItem(allProducts[i].storKeyClick);
       tmpData++;
-      sessionStorage.setItem(allProducts[i].storKeyClick, tmpData);
+      allProducts[i].clicks = tmpData++;
+      localStorage.setItem(allProducts[i].storKeyClick, tmpData);
       storedClicks[i] = tmpData;
 
-      console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].storKeyClick));
+      console.log('getItem from local storage', localStorage.getItem(allProducts[i].storKeyClick));
     }
   }
   for(i = 0; i < prodArr.length; i++)
@@ -165,9 +217,10 @@ function handleClick(id)
     var tmpIndex = prodArr[i].title;
     if(tmpIndex === allProducts[i].name)
     {
-      var tmpData2 = sessionStorage.getItem(tmpIndex + 'ViewKey');
+      var tmpData2 = localStorage.getItem(tmpIndex + 'ViewKey');
       tmpData2++;
-      sessionStorage.setItem(allProducts[i].storKey, tmpData2);
+      allProducts[i].views = tmpData2;
+      localStorage.setItem(allProducts[i].storKey, tmpData2);
       storedViews[i] = tmpData2;
     }
   }
@@ -203,11 +256,32 @@ function makeChart()
   busMallChart = new Chart(ctx,{
     type: 'bar',
     data: data,
+    label: 'Bus Mall Metrics',
+    hidden: true,
   });
+  /*
+  while(checkClicks() > 25)
+  {
+    busMallChart.hidden = false;
+  }
+  */
 }
 
+function checkClick()
+{
+  if(localStorage)
+  {
+    makeChart();
+  }
+  else
+  {
+    prepChartData();
+    generateProd();
+  }
+}
 prepChartData();
 generateProd();
+
 
 document.getElementById('pickpic').addEventListener('click',function(event)
 {
@@ -228,5 +302,3 @@ document.getElementById('pickpic').removeEventListener('click',function(event)
 console.log(sessionStorage.getItem(allProducts[0].storKey));
 console.log(allProducts[14].storKey);
 */
-
-
