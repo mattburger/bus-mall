@@ -167,7 +167,7 @@ var data =
   [{
     data: storedClicks,
     backgroundColor: chartColors,
-    hoverBackGroundColor:
+    /*hoverBackGroundColor:
     [
       'purple',
       'purple',
@@ -175,6 +175,7 @@ var data =
       'purple',
       'purple'
     ]
+    */
   }]
 };
 
@@ -185,8 +186,6 @@ function makeChart()
     type: 'bar',
     data: data,
   });
-  console.log(storedClicks);
-  console.log(productName);
 }
 
 prepChartData();
