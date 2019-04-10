@@ -2,6 +2,8 @@
 
 //array of all product names
 var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','sweep','tauntaun','unicorn','usb','water-can','wine-glass'];
+var chartColors = ['bisque','darkgray','burlywood','lightblue','navy','maroon','brown','red','orange','yellow','beige','mint','lavender','apricot','cyan','green','brown','gray','olive','teal','black','navy','white','blue','lime'];
+console.log(chartColors.length);
 var storedClicks = [];
 var storedViews = [];
 var productName = [];
@@ -164,14 +166,7 @@ var data =
   datasets:
   [{
     data: storedClicks,
-    backgroundColor: 
-    [
-      'bisque',
-      'darkgray',
-      'burlywood',
-      'lightblue',
-      'navy'
-    ],
+    backgroundColor: chartColors,
     hoverBackGroundColor:
     [
       'purple',
