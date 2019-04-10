@@ -34,20 +34,69 @@ function rand()
 {
   return (Math.floor(Math.random() * allProducts.length));
 }
+function dupCheck(arr)
+{
+  for(var i = 1; i < arr.length;i++)
+  {
+    for(var j = 0; j < arr.legth; j++)
+    {
+      if(i !== j)
+      {
+        if(arr[i] === arr[j])
+        {
+          return true;
+        }
+      }
+    }
+  }
+}
+function genRandArr()
+{
+  while((randArr.length < 3) && (dupCheck || randArr === []))
+  {
+    for(var i = 0; i < 3;i++)
+    {
+      randArr.push(rand());
+    }
+  }
+  console.log('randArr:',randArr);
+}
+function lastViewed()
+{
+  var flag = false;
+  if(randArr.length > lastViewed.length)
+  {
+    flag = false;
+  }
+  else
+  {
+    for(var i = 0; i < randArr.length;i++)
+    {
+      for(var j = 0; j < lastViewedArr.legth; j++)
+      {
+        if(randArr[i] === lastViewed[j])
+        {
+          flag = true;
+        }
+      }
+    }
+  }
+  return flag;
+}
 
 var prod1 = document.getElementById('prod1');
 var prod2 = document.getElementById('prod2');
 var prod3 = document.getElementById('prod3');
 var prodArr = [prod1,prod2,prod3];
-console.table(allProducts);
+//console.table(allProducts);
 
 function generateProd()
 {
   //document.getElementById('pickpic').removeEventListener()
+  genRandArr();
+  lastViewed();
   for(var i = 0; i < prodArr.length;i++)
   {
-    randArr.push(rand());
-
     prodArr[i].src = allProducts[randArr[i]].url;
     prodArr[i].alt = allProducts[randArr[i]].alt;
     prodArr[i].title = allProducts[randArr[i]].title;
