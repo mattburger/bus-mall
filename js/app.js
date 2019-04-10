@@ -9,7 +9,7 @@ var storedViews = [];
 var productName = [];
 //hold all objects of mallProduct
 var allProducts = [];
-var lastViewedArr;
+var lastViewedArr = [];
 var randArr = [];
 var busMallChart;
 
@@ -36,53 +36,64 @@ function rand()
 {
   return (Math.floor(Math.random() * allProducts.length));
 }
-function dupCheck(arr)
-{
-  for(var i = 1; i < arr.length;i++)
-  {
-    for(var j = 0; j < arr.legth; j++)
-    {
-      if(i !== j)
-      {
-        if(arr[i] === arr[j])
-        {
-          return true;
-        }
-      }
-    }
-  }
-}
+
 function genRandArr()
 {
-  while((randArr.length < 3) && (dupCheck || randArr === []))
+  while(randArr.length < 3)
   {
     for(var i = 0; i < 3;i++)
     {
       randArr.push(rand());
     }
   }
-  console.log('randArr:',randArr);
 }
-function lastViewed()
+function dupCheck(arr)
 {
   var flag = false;
-  if(randArr.length > lastViewed.length)
+  if(arr === [])
   {
-    flag = false;
+    return flag;
   }
   else
   {
-    for(var i = 0; i < randArr.length;i++)
+    for(var i = 0; i < arr.length;i++)
     {
-      for(var j = 0; j < lastViewedArr.legth; j++)
+      for(var j = 0; j < arr.legth; j++)
       {
-        if(randArr[i] === lastViewed[j])
+        if(i !== j)
         {
-          flag = true;
+          if(arr[i] === arr[j])
+          {
+            flag = true;
+            return flag;
+          }
         }
       }
     }
   }
+  return flag;
+}
+function lastViewed()
+{
+  var flag = false;
+  console.log(lastViewedArr);
+  if(lastViewedArr.length < 3)
+  {
+    return flag;
+  }
+  for(var i = 0; i < lastViewedArr.length;i++)
+  {
+    for(var j = 0; j < randArr.length; j++)
+    {
+      console.log('last viewed comparison: ' + lastViewed[j] + ' vs ' + randArr[i] );
+      if(lastViewed[j]===randArr[i])
+      {
+        flag = true;
+        return flag;
+      }
+    }
+  }
+  console.log('lastViewed check:',flag);
   return flag;
 }
 
@@ -96,7 +107,14 @@ function generateProd()
 {
   //document.getElementById('pickpic').removeEventListener()
   genRandArr();
-  lastViewed();
+  while(dupCheck(randArr))
+  {
+    genRandArr();
+  }
+  while(lastViewed())
+  {
+    genRandArr();
+  }
   for(var i = 0; i < prodArr.length;i++)
   {
     prodArr[i].src = allProducts[randArr[i]].url;
