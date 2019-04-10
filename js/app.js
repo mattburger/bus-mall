@@ -2,16 +2,20 @@
 
 //array of all product names
 var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','sweep','tauntaun','unicorn','usb','water-can','wine-glass'];
-//var storedClicks = [];
-//var storedViews = [];
+var storedClicks = [];
+var storedViews = [];
+var productName = [];
 //hold all objects of mallProduct
 var allProducts = [];
-var randArr;
+var lastViewedArr;
+var randArr = [];
+var busMallChart;
 
 function MallProduct(name)
 {
   this.name = name;
-  this.storKey = name + 'key';
+  this.storKeyClick = name + 'ClickKey';
+  this.storKeyView = name + 'ViewKey';
   this.url = './pictures/' + name + '.jpg';
   this.alt = name;
   this.title = name;
@@ -26,44 +30,9 @@ for(var i = 0; i < picPool.length; i++)
 {
   new MallProduct(picPool[i]);
 }
-function rand(max)
+function rand()
 {
-  var rArr = [];
-  for(var i = 0; i < 6; i++)
-  {
-    rArr.push(Math.floor(Math.random() * max));
-  }
-  return rArr;
-}
-
-function handleClick(event)
-{
-  console.log('In evenHandler');
-  var tmpName = event.target.title;
-  for(var i = 0; i < allProducts.length; i++)
-  {
-
-    if(tmpName === allProducts[i].name)
-    {
-      var tmpData = sessionStorage.getItem(allProducts[i].storKey);
-      tmpData++;
-      sessionStorage.setItem(allProducts[i].storKey, tmpData);
-      console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].storKey));
-    }
-  }
-  for(i = 0; i < prodArr.length; i++)
-  {
-    var tmpIndex = prodArr[i].title;
-    if(tmpIndex === allProducts[i].name)
-    {
-      var tmpData2 = sessionStorage.getItem(tmpIndex+'key');
-      tmpData2++;
-      sessionStorage.setItem(allProducts[i].storKey, tmpData2);
-    }
-  }
-  document.location.reload();
-  // event.preventDefault();
-
+  return (Math.floor(Math.random() * allProducts.length));
 }
 
 var prod1 = document.getElementById('prod1');
@@ -71,51 +40,132 @@ var prod2 = document.getElementById('prod2');
 var prod3 = document.getElementById('prod3');
 var prodArr = [prod1,prod2,prod3];
 console.table(allProducts);
+
 function generateProd()
 {
-  randArr = rand(0,allProducts.length-1);
-  for(var i = 0; i < randArr.length; i++)
+  //document.getElementById('pickpic').removeEventListener()
+  for(var i = 0; i < prodArr.length;i++)
   {
-    for(var j = 0; j<randArr.length;j++)
+    randArr.push(rand());
+
+    prodArr[i].src = allProducts[randArr[i]].url;
+    prodArr[i].alt = allProducts[randArr[i]].alt;
+    prodArr[i].title = allProducts[randArr[i]].title;
+  }
+  lastViewedArr = randArr;
+  randArr = [];
+}
+function clearProd()
+{
+  for(var i = 0; i < prodArr.length; i++)
+  {
+    prodArr[i].src = '';
+    prodArr[i].alt = '';
+    prodArr[i].title = '';
+  }
+}
+function prepChartData()
+{
+  for(var i = 0; i < allProducts.length; i++)
+  {
+    productName.push(allProducts[i].title);
+    storedClicks.push(0);
+    storedViews.push(0);
+  }
+}
+function handleClick(id)
+{
+  console.log('In evenHandler');
+  var tmpName;
+  for(var i = 0; i < allProducts.length; i++)
+  {
+    tmpName = document.getElementById(id).title;
+
+    if(tmpName === allProducts[i].name)
     {
-      if(randArr[i] === randArr[j])
-      {
-        randArr[i] = Math.floor(Math.random() * allProducts.length);
-      }
+      var tmpData = sessionStorage.getItem(allProducts[i].storKeyClick);
+      tmpData++;
+      sessionStorage.setItem(allProducts[i].storKeyClick, tmpData);
+      storedClicks[i] = tmpData;
+
+      console.log('getItem from session storage', sessionStorage.getItem(allProducts[i].storKeyClick));
     }
   }
-  if(randArr === [])
+  for(i = 0; i < prodArr.length; i++)
   {
-    randArr = rand();
+    var tmpIndex = prodArr[i].title;
+    if(tmpIndex === allProducts[i].name)
+    {
+      var tmpData2 = sessionStorage.getItem(tmpIndex + 'ViewKey');
+      tmpData2++;
+      sessionStorage.setItem(allProducts[i].storKey, tmpData2);
+      storedViews[i] = tmpData2;
+    }
   }
-  prod1.src = allProducts[ randArr[randArr.length-1] ].url;
-  prod1.alt = allProducts[ randArr[randArr.length-1] ].alt;
-  prod1.title = allProducts[ randArr[randArr.length-1] ].title;
-  randArr.pop();
-
-  prod2.src = allProducts[ randArr[randArr.length-1] ].url;
-  prod2.alt = allProducts[ randArr[randArr.length-1] ].alt;
-  prod2.title = allProducts[ randArr[randArr.length-1] ].title;
-  randArr.pop();
-
-  prod3.src = allProducts[ randArr[randArr.length-1] ].url;
-  prod3.alt = allProducts[ randArr[randArr.length-1] ].alt;
-  prod3.title = allProducts[ randArr[randArr.length-1] ].title;
-  randArr.pop();
-
+  clearProd();
+  generateProd();
+  makeChart();
 }
 
+//http://www.chartjs.org/ 
+
+var data =
+{
+  labels: productName,
+  datasets:
+  [{
+    data: storedClicks,
+    backgroundColor: 
+    [
+      'bisque',
+      'darkgray',
+      'burlywood',
+      'lightblue',
+      'navy'
+    ],
+    hoverBackGroundColor:
+    [
+      'purple',
+      'purple',
+      'purple',
+      'purple',
+      'purple'
+    ]
+  }]
+};
+
+function makeChart()
+{
+  var ctx = document.getElementById('busmall-chart').getContext('2d');
+  busMallChart = new Chart(ctx,{
+    type: 'bar',
+    data: data,
+  });
+  console.log(storedClicks);
+  console.log(productName);
+}
+
+prepChartData();
 generateProd();
-prod1.addEventListener('click',handleClick);
-//prod1.removeEventListener('click',handleClick);
-prod2.addEventListener('click',handleClick);
-//prod2.removeEventListener('click',handleClick);
-prod3.addEventListener('click',handleClick);
-//prod3.removeEventListener('click',handleClick);
 
+document.getElementById('pickpic').addEventListener('click',function(event)
+{
+  if(event.target.id !== 'pickpic')
+  {
+    handleClick(event.target.id);
+  }
+});
+document.getElementById('pickpic').removeEventListener('click',function(event)
+{
+  if(event.target.id !== 'pickpic')
+  {
+    handleClick(event.target.id);
+  }
+});
 
+/*
 console.log(sessionStorage.getItem(allProducts[0].storKey));
 console.log(allProducts[14].storKey);
-
+*/
 
 
