@@ -194,6 +194,7 @@ function handleClick(id)
   }
   clearProd();
   generateProd();
+  /*ADD AN ELSEIF TO ACCOUNT FOR PREV LOCAL STORAGE */
 
   if(checkClicks()>=25)
   {
@@ -205,6 +206,7 @@ function handleClick(id)
 
 //http://www.chartjs.org/ 
 
+//console.log('YAYAYAYAYAYYA', storedClicks);
 var data =
 {
   labels: productName,
