@@ -3,9 +3,6 @@
 //array of all product names
 var picPool = ['bag','banana','bathroom','boots','breakfast','bubblegum','chair','cthulhu','dog-duck','dragon','pen','pet-sweep','scissors','shark','sweep','tauntaun','unicorn','usb','water-can','wine-glass'];
 var chartColors = ['bisque','darkgray','burlywood','lightblue','navy','maroon','brown','red','orange','yellow','beige','mint','lavender','apricot','cyan','green','brown','gray','olive','teal'/*,'black','navy','white','blue','lime'*/];
-var randArrData = [];
-var dupTracker = [];
-var lastViewTracker = [];
 var storedClicks = [];
 var storedViews = [];
 var productName = [];
@@ -15,19 +12,7 @@ var lastViewedArr = [];
 var randArr = [];
 var busMallChart;
 
-function fillRandArrData(arr)
-{
-  for(var i = 0; i < 20; i++)
-  {
-    arr.push(i);
-  }
-}
-
-fillRandArrData(randArrData);
-
-var funcUseArr = randArrData;
-console.log('copied to funcUseArr',funcUseArr);
-
+/*--------------constructor stuff--------------*/
 function MallProduct(name)
 {
   this.name = name;
@@ -45,103 +30,62 @@ for(var i = 0; i < picPool.length; i++)
 {
   new MallProduct(picPool[i]);
 }
-//var toLs = JSON.stringify(allProducts);
-//localStorage.setItem('allProducts',toLs);
+/*----------------end of constructor stuff----------------*/
 
-function rand(arr)
+
+function rand(number)
 {
-  return (Math.floor(Math.random() * arr.length));
+  return (Math.floor(Math.random() * Math.floor(number)));
 }
 
-function genRandArr(arr)
+function genRandArr()
 {
-  while(arr.length < 3)
+  var arr = [];
+  for(var i = 0; i < 3; i++)
   {
-    for(var i = 0; i < 3;i++)
-    {
-      arr.push(rand(allProducts));
-    }
+    arr.push(rand(20));
   }
-  console.log(arr);
-}
-
-
-function dupFixer(rArr,dupTrack,rArrData)
-{
-
-  if(rArrData.length < allProducts.length)
-  {
-    console.log('dupfixer randArrData passed in:',rArrData);
-    for(var i = 0; i < dupTrack.length;i++)
-    {
-      rArr[dupTrack[i]] = rArrData[rand(rArrData.length)];
-    }
-    dupTrack = [];
-    rArrData = [];
-
-  }
-
+  //console.log(arr);
+  return arr;
 }
 
 
-function lastViewedFixer(rArr,lvTrack,rArrData)
+/*thanks to @Raynos with Stackoverflow */
+function xorSwapHalf(array)
 {
-
-  for(var i = 0; i < lvTrack.length;i++)
+  var i = null;
+  var r = null;
+  var length = array.length;
+  for (i = 0; i < length / 2; i += 1)
   {
-    rArr[lvTrack[i]] = rArrData[rand(rArrData)];
+    r = length - 1 - i;
+    var left = array[i];
+    var right = array[r];
+    left ^= right;
+    right ^= left;
+    left ^= right;
+    array[i] = left;
+    array[r] = right;
   }
-  lvTrack = [];
-  rArrData = [];
-
+  return array;
 }
 
 
-function lastViewed(arr)
+
+function checkDupLastView(rArr,lastArr)
 {
-  for(var k = 0; k < funcUseArr.length;k++)
+  var someKey = null;
+  var rArr2 = rArr;
+  xorSwapHalf(rArr2);
+  for(var i = 0; i < rArr.length;i++)
   {
-    if(arr[k] === funcUseArr[k])
+    if((rArr[i] === rArr2[i]) || rArr.includes(lastArr[i]))
     {
-      funcUseArr.splice(k,1);
+      someKey = i;
+      return 1;
     }
   }
-
-  for(var i = 0; i < lastViewedArr.length;i++)
-  {
-    for(var j = 0; j < arr.length; j++)
-    {
-
-      if(lastViewedArr[i] === arr[j])
-      {
-        lastViewTracker.push(lastViewedArr[i]);
-      }
-    }
-  }
-  lastViewedFixer(randArr,lastViewTracker,randArrData);
-}
-
-function dupCheck(arr)
-{
-
-  for(var i = 0; i < arr.length;i++)
-  {
-    for(var j = 0; j < arr.legth; j++)
-    {
-      if(i !== j)
-      {
-        if(arr[i] === arr[j])
-        {
-          randArrData.splice(arr[i],1);
-          console.log('splicy splicy',funcUseArr.splice(arr[i],1));
-          dupTracker.push(arr[i]);
-
-        }
-      }
-    }
-  }
-
-  dupFixer(randArr,dupTracker,randArrData);
+  return 0,someKey;
 }
 
 var prod1 = document.getElementById('prod1');
@@ -150,22 +94,44 @@ var prod3 = document.getElementById('prod3');
 var prodArr = [prod1,prod2,prod3];
 //console.table(allProducts);
 
+
+/*----------------values for generating random pics----------------*/
+
 function generateProd()
 {
-  genRandArr(randArr);
-  /*need to tweak these two functions. possibility of clashing*/
-  dupCheck(randArr);
-  lastViewed(randArr);
-
-  for(var i = 0; i < prodArr.length;i++)
+  var counter = 0;
+  randArr = genRandArr();
+  var codes = checkDupLastView(randArr,lastViewedArr);
+  while(codes[0] === 1)
   {
+    randArr[codes[1]] = rand(20);
+    codes = checkDupLastView(randArr,lastViewedArr);
+    counter += 1;
+    console.log(codes[1]);
+    console.log('in while',randArr);
+    if(counter > 120)
+    {
+      console.log('ewww this is stupid');
+      console.log('in while counter',counter);
+      return 'ARRRRGHHHHHH';
+    }
+  }
+  counter = 0;
+  //console.log('after while',randArr);
+  for(i = 0; i < prodArr.length;i++)
+  {
+    //console.log(randArr);
     prodArr[i].src = allProducts[randArr[i]].url;
     prodArr[i].alt = allProducts[randArr[i]].alt;
     prodArr[i].title = allProducts[randArr[i]].title;
   }
   lastViewedArr = randArr;
   randArr = [];
+  //storedClicks = createClicksArr();
 }
+
+/*----------------end of generating random pics----------------*/
+
 function clearProd()
 {
   for(var i = 0; i < prodArr.length; i++)
@@ -183,15 +149,25 @@ function prepChartData()
     storedClicks.push(0);
     storedViews.push(0);
   }
+  storedClicks = createClicksArr();
 }
 function checkClicks()
 {
   var tmpTotal = 0;
-  for(var i = 0; i < storedClicks.length; i++)
+  for(var i = 0; i < allProducts.length; i++)
   {
-    tmpTotal+=storedClicks[i];
+    tmpTotal+=allProducts[i].clicks;
   }
   return tmpTotal;
+}
+function createClicksArr()
+{
+  var arr = [];
+  for(var i = 0; i < allProducts.length;i++)
+  {
+    arr.push(allProducts[i].clicks);
+  }
+  return arr;
 }
 function handleClick(id)
 {
@@ -203,30 +179,28 @@ function handleClick(id)
 
     if(tmpName === allProducts[i].name)
     {
-      var tmpData = localStorage.getItem(allProducts[i].storKeyClick);
-      tmpData++;
-      allProducts[i].clicks = tmpData++;
-      localStorage.setItem(allProducts[i].storKeyClick, tmpData);
-      storedClicks[i] = tmpData;
-
-      console.log('getItem from local storage', localStorage.getItem(allProducts[i].storKeyClick));
+      allProducts[i].clicks += 1;
+      localStorage.setItem(allProducts[i].storKeyClick, allProducts[i].clicks);
+      //console.log('getItem from local storage', localStorage.getItem(allProducts[i].storKeyClick));
     }
   }
   for(i = 0; i < prodArr.length; i++)
   {
-    var tmpIndex = prodArr[i].title;
-    if(tmpIndex === allProducts[i].name)
+    if(prodArr[i].title === allProducts[i].name)
     {
-      var tmpData2 = localStorage.getItem(tmpIndex + 'ViewKey');
-      tmpData2++;
-      allProducts[i].views = tmpData2;
-      localStorage.setItem(allProducts[i].storKey, tmpData2);
-      storedViews[i] = tmpData2;
+      allProducts[i].views += 1;
+      localStorage.setItem(allProducts[i].storKeyView, allProducts[i].views);
     }
   }
   clearProd();
   generateProd();
-  makeChart();
+
+  if(checkClicks()>=25)
+  {
+    makeChart();
+    document.getElementById('pickpic').removeEventListener('click',_listener);
+
+  }
 }
 
 //http://www.chartjs.org/ 
@@ -252,51 +226,54 @@ var data =
 
 function makeChart()
 {
+  //data[0].data = createClicksArr();
   var ctx = document.getElementById('busmall-chart').getContext('2d');
   busMallChart = new Chart(ctx,{
     type: 'bar',
     data: data,
     label: 'Bus Mall Metrics',
-    hidden: true,
+    hidden: true
   });
-  /*
-  while(checkClicks() > 25)
-  {
-    busMallChart.hidden = false;
-  }
-  */
+
+  //hideDaChart();
+
 }
 
-/*function checkClick()
+if(localStorage.length > 0)
 {
-  if(localStorage)
+  for(i = 0; i < allProducts.length; i++)
   {
-    makeChart();
+    if(localStorage.getItem(allProducts[i].storKeyClick))
+    {
+      allProducts[i].clicks = JSON.parse(localStorage.getItem(allProducts[i].storKeyClick));
+      storedClicks[i] = allProducts[i].clicks;
+      if(localStorage.getItem(allProducts[i].storKeyView))
+      {
+        allProducts[i].views = JSON.parse(localStorage.getItem(allProducts[i].storKeyView));
+      }
+      else
+      {
+        allProducts[i].views = 0;
+      }
+    }
+    else
+    {
+      allProducts[i].clicks = 0;
+      allProducts[i].views = 0;
+    }
   }
-  else
-  {
-    prepChartData();
-    generateProd();
-  }
-}*/
+}
+
 prepChartData();
 generateProd();
 
-
-document.getElementById('pickpic').addEventListener('click',function(event)
-{
+var _listener = function(event){
   if(event.target.id !== 'pickpic')
   {
     handleClick(event.target.id);
   }
-});
-document.getElementById('pickpic').removeEventListener('click',function(event)
-{
-  if(event.target.id !== 'pickpic')
-  {
-    handleClick(event.target.id);
-  }
-});
+};
+document.getElementById('pickpic').addEventListener('click',_listener);
 
 /*
 console.log(sessionStorage.getItem(allProducts[0].storKey));
