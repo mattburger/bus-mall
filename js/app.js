@@ -148,7 +148,7 @@ function prepChartData()
     storedClicks.push(0);
     storedViews.push(0);
   }
-  storedClicks = createClicksArr();
+  //storedClicks = createClicksArr();
 }
 function checkClicks()
 {
@@ -159,7 +159,7 @@ function checkClicks()
   }
   return tmpTotal;
 }
-function createClicksArr()
+/*function createClicksArr()
 {
   var arr = [];
   for(var i = 0; i < allProducts.length;i++)
@@ -167,7 +167,7 @@ function createClicksArr()
     arr.push(allProducts[i].clicks);
   }
   return arr;
-}
+}*/
 function handleClick(id)
 {
   console.log('In evenHandler');
@@ -198,6 +198,7 @@ function handleClick(id)
 
   if(checkClicks()>=25)
   {
+    //prepChartData();
     makeChart();
     document.getElementById('pickpic').removeEventListener('click',_listener);
 
@@ -237,7 +238,6 @@ function makeChart()
     hidden: true
   });
 
-  //hideDaChart();
 
 }
 
