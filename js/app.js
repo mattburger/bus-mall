@@ -92,7 +92,7 @@ var prod1 = document.getElementById('prod1');
 var prod2 = document.getElementById('prod2');
 var prod3 = document.getElementById('prod3');
 var prodArr = [prod1,prod2,prod3];
-//console.table(allProducts);
+
 
 
 /*----------------values for generating random pics----------------*/
@@ -117,17 +117,16 @@ function generateProd()
     }
   }
   counter = 0;
-  //console.log('after while',randArr);
+
   for(i = 0; i < prodArr.length;i++)
   {
-    //console.log(randArr);
+
     prodArr[i].src = allProducts[randArr[i]].url;
     prodArr[i].alt = allProducts[randArr[i]].alt;
     prodArr[i].title = allProducts[randArr[i]].title;
   }
   lastViewedArr = randArr;
   randArr = [];
-  //storedClicks = createClicksArr();
 }
 
 /*----------------end of generating random pics----------------*/
@@ -181,7 +180,7 @@ function handleClick(id)
     {
       allProducts[i].clicks += 1;
       localStorage.setItem(allProducts[i].storKeyClick, allProducts[i].clicks);
-      //console.log('getItem from local storage', localStorage.getItem(allProducts[i].storKeyClick));
+      storedClicks[i] += 1;
     }
   }
   for(i = 0; i < prodArr.length; i++)
@@ -190,6 +189,7 @@ function handleClick(id)
     {
       allProducts[i].views += 1;
       localStorage.setItem(allProducts[i].storKeyView, allProducts[i].views);
+      storedViews[i] += 1;
     }
   }
   clearProd();
